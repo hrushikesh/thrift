@@ -555,6 +555,16 @@ void t_hs_generator::generate_hs_struct_definition(ofstream& out,
 
   out << " deriving (Show,Eq,Typeable)" << endl;
 
+  indent(out) << "f_basic_" << tname << " = " << tname << " {";
+  bool first = true;
+  for (m_iter = members.begin(); m_iter != members.end(); ++m_iter) {
+    out << (first ? "" : ",");
+    out << "f_" << tname << "_" << decapitalize((*m_iter)->get_name()) << "=Nothing";
+    first = false;
+  }
+
+  out << "}" << endl;
+
   if (is_exception)
     out << "instance Exception " << tname << endl;
 
@@ -637,16 +647,8 @@ void t_hs_generator::generate_hs_struct_reader(ofstream& out, t_struct* tstruct)
   indent(out) << "read_" << sname << " iprot = do" << endl;
   indent_up();
   indent(out) << "_ <- readStructBegin iprot" << endl;
-  indent(out) << "record <- read_" << sname << "_fields iprot (" << sname << "{";
+  indent(out) << "record <- read_" << sname << "_fields iprot f_basic_" << sname << endl;
 
-  bool first = true;
-  for (f_iter = fields.begin(); f_iter != fields.end(); ++f_iter) {
-    out << (first ? "" : ",");
-    out << "f_" << sname << "_" << decapitalize((*f_iter)->get_name()) << "=Nothing";
-    first = false;
-  }
-
-  out << "})" << endl;
   indent(out) << "readStructEnd iprot" << endl;
   indent(out) << "return record" << endl;
   indent_down();
