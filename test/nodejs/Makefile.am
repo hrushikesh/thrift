@@ -22,12 +22,35 @@ stubs: ../ThriftTest.thrift
 	$(THRIFT) --gen js:node ../ThriftTest.thrift
 
 check: stubs
+	@if which nodeunit &> /dev/null ; then \
+		echo "   Testing thrift/binary"; \
+		NODE_PATH=../../lib/nodejs/lib:../../lib/nodejs/lib/thrift:$(NODE_PATH) nodeunit ../../lib/nodejs/test/binary.test.js; \
+	fi
+	@if which node &> /dev/null ; then \
+		echo "   Testing Client/Server"; \
+		timeout -s14 5 $(MAKE) server & \
+		sleep 1; $(MAKE) client; sleep 2; \
+		\
+		echo "   Testing Multiplex Client/Server"; \
+		sleep 4; timeout -s14 5 $(MAKE) mserver & \
+		sleep 1; $(MAKE) mclient; sleep 2; \
+		\
+		echo "   Testing Client/Server examples"; \
+		sleep 4; timeout -s14 5 $(MAKE) -C ../../lib/nodejs/examples server & \
+		sleep 1; $(MAKE) -C ../../lib/nodejs/examples client; sleep 2; \
+	fi
 
 clean-local:
 	$(RM) -r gen-nodejs
 
-server: stubs
+server:
 	NODE_PATH=../../lib/nodejs/lib:../../lib/nodejs/lib/thrift:$(NODE_PATH) node server.js
 
-client: stubs
+client:
 	NODE_PATH=../../lib/nodejs/lib:../../lib/nodejs/lib/thrift:$(NODE_PATH) node client.js
+
+mserver:
+	NODE_PATH=../../lib/nodejs/lib:../../lib/nodejs/lib/thrift:$(NODE_PATH) node --harmony multiplex_server.js
+
+mclient:
+	NODE_PATH=../../lib/nodejs/lib:../../lib/nodejs/lib/thrift:$(NODE_PATH) node --harmony multiplex_client.js

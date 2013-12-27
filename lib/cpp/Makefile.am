@@ -48,7 +48,7 @@ pkgconfig_DATA += thrift-qt.pc
 endif
 
 AM_CXXFLAGS = -Wall
-AM_CPPFLAGS = $(BOOST_CPPFLAGS) -I$(srcdir)/src -I$(srcdir)/src/thrift
+AM_CPPFLAGS = $(BOOST_CPPFLAGS) -I$(srcdir)/src
 AM_LDFLAGS = $(BOOST_LDFLAGS)
 
 # Define the source files for the module
@@ -124,6 +124,7 @@ libthriftqt_la_LDFLAGS   = -release $(VERSION) $(BOOST_LDFLAGS) $(QT_LIBS)
 include_thriftdir = $(includedir)/thrift
 include_thrift_HEADERS = \
                          $(top_builddir)/config.h \
+                         src/thrift/thrift-config.h \
                          src/thrift/TDispatchProcessor.h \
                          src/thrift/Thrift.h \
                          src/thrift/TReflectionLocal.h \
@@ -140,6 +141,10 @@ include_concurrency_HEADERS = \
                          src/thrift/concurrency/Monitor.h \
                          src/thrift/concurrency/PlatformThreadFactory.h \
                          src/thrift/concurrency/PosixThreadFactory.h \
+                         src/thrift/concurrency/StdMonitor.cpp \
+                         src/thrift/concurrency/StdMutex.cpp \
+                         src/thrift/concurrency/StdThreadFactory.cpp \
+                         src/thrift/concurrency/StdThreadFactory.h \
                          src/thrift/concurrency/Thread.h \
                          src/thrift/concurrency/ThreadManager.h \
                          src/thrift/concurrency/TimerManager.h \
@@ -165,6 +170,7 @@ include_protocol_HEADERS = \
 
 include_transportdir = $(include_thriftdir)/transport
 include_transport_HEADERS = \
+                         src/thrift/transport/PlatformSocket.h \
                          src/thrift/transport/TFDTransport.h \
                          src/thrift/transport/TFileTransport.h \
                          src/thrift/transport/TSimpleFileTransport.h \

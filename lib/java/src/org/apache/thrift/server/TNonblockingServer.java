@@ -164,6 +164,11 @@ public class TNonblockingServer extends AbstractNonblockingServer {
       } catch (Throwable t) {
         LOGGER.error("run() exiting due to uncaught error", t);
       } finally {
+        try {
+          selector.close();
+        } catch (IOException e) {
+          LOGGER.error("Got an IOException while closing selector!", e);
+        }
         stopped_ = true;
       }
     }
@@ -224,9 +229,11 @@ public class TNonblockingServer extends AbstractNonblockingServer {
         clientKey = client.registerSelector(selector, SelectionKey.OP_READ);
 
         // add this key to the map
-        FrameBuffer frameBuffer = new FrameBuffer(client, clientKey,
-          SelectAcceptThread.this);
-        clientKey.attach(frameBuffer);
+          FrameBuffer frameBuffer = processorFactory_.isAsyncProcessor() ?
+                  new AsyncFrameBuffer(client, clientKey,SelectAcceptThread.this) :
+                  new FrameBuffer(client, clientKey,SelectAcceptThread.this);
+
+          clientKey.attach(frameBuffer);
       } catch (TTransportException tte) {
         // something went wrong accepting.
         LOGGER.warn("Exception trying to accept!", tte);

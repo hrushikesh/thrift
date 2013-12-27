@@ -54,7 +54,6 @@ check-local:
 EXTRA_DIST = \
 	test.sh \
 	cpp \
-	csharp \
 	hs \
 	nodejs \
 	ocaml \
@@ -71,6 +70,7 @@ EXTRA_DIST = \
 	DebugProtoTest.thrift \
 	DenseLinkingTest.thrift \
 	DocTest.thrift \
+	Include.thrift \
 	JavaBeansTest.thrift \
 	ManyOptionals.thrift \
 	ManyTypedefs.thrift \

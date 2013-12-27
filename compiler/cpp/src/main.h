@@ -48,9 +48,19 @@ void pdebug(const char* fmt, ...);
 void pwarning(int level, const char* fmt, ...);
 
 /**
+ * Print verbose output message
+ */
+void pverbose(const char* fmt, ...);
+
+/**
  * Failure!
  */
 void failure(const char* fmt, ...);
+
+/**
+ * Check simple identifier names
+ */
+void validate_simple_identifier(const char* identifier);
 
 /**
  * Check constant types
