@@ -56,6 +56,9 @@ class t_hs_generator : public t_oop_generator {
     out_dir_base_ = "gen-hs";
   }
 
+  string modified_path();
+  string module_prefix();
+
   /**
    * Init and close methods
    */
@@ -185,6 +188,14 @@ class t_hs_generator : public t_oop_generator {
   ofstream f_client_;
 };
 
+string t_hs_generator::modified_path() {
+  return get_out_dir() + (program_ -> get_namespace("hs")) + "/";
+}
+
+string t_hs_generator::module_prefix() {
+  return "module " + (program_ -> get_namespace("hs")) + ".";
+}
+
 /**
  * Prepares for file generation by opening up the necessary file output
  * streams.
@@ -194,24 +205,25 @@ class t_hs_generator : public t_oop_generator {
 void t_hs_generator::init_generator() {
   // Make output directory
   MKDIR(get_out_dir().c_str());
+  MKDIR(modified_path().c_str());
 
   // Make output file
   string pname = capitalize(program_name_);
-  string f_types_name = get_out_dir() + pname + "_Types.hs";
+  string f_types_name = modified_path() + pname + "_Types.hs";
   f_types_.open(f_types_name.c_str());
 
-  string f_consts_name = get_out_dir() + pname + "_Consts.hs";
+  string f_consts_name = modified_path() + pname + "_Consts.hs";
   f_consts_.open(f_consts_name.c_str());
 
   // Print header
   f_types_ << hs_language_pragma() << endl;
   f_types_ << hs_autogen_comment() << endl;
-  f_types_ << "module " << pname << "_Types where" << endl;
+  f_types_ << module_prefix() << pname << "_Types where" << endl;
   f_types_ << hs_imports() << endl;
 
   f_consts_ << hs_language_pragma() << endl;
   f_consts_ << hs_autogen_comment() << endl;
-  f_consts_ << "module " << pname << "_Consts where" << endl;
+  f_consts_ << module_prefix() << pname << "_Consts where" << endl;
   f_consts_ << hs_imports() << endl;
   f_consts_ << "import " << pname << "_Types" << endl;
 }
@@ -699,12 +711,12 @@ void t_hs_generator::generate_hs_struct_writer(ofstream& out,
  * @param tservice The service definition
  */
 void t_hs_generator::generate_service(t_service* tservice) {
-  string f_service_name = get_out_dir() + capitalize(service_name_) + ".hs";
+  string f_service_name = modified_path() + capitalize(service_name_) + ".hs";
   f_service_.open(f_service_name.c_str());
 
   f_service_ << hs_language_pragma() << endl;
   f_service_ << hs_autogen_comment() << endl;
-  f_service_ << "module " << capitalize(service_name_) << " where" << endl;
+  f_service_ << module_prefix() << capitalize(service_name_) << " where" << endl;
   f_service_ << hs_imports() << endl;
 
   if (tservice->get_extends()) {
@@ -771,13 +783,13 @@ void t_hs_generator::generate_hs_function_helpers(t_function* tfunction) {
  * @param tservice The service to generate a header definition for
  */
 void t_hs_generator::generate_service_interface(t_service* tservice) {
-  string f_iface_name = get_out_dir() + capitalize(service_name_) + "_Iface.hs";
+  string f_iface_name = modified_path() + capitalize(service_name_) + "_Iface.hs";
   f_iface_.open(f_iface_name.c_str());
 
   f_iface_ << hs_language_pragma() << endl;
   f_iface_ << hs_autogen_comment() << endl;
 
-  f_iface_ << "module " << capitalize(service_name_) << "_Iface where" << endl;
+  f_iface_ << module_prefix() << capitalize(service_name_) << "_Iface where" << endl;
 
   f_iface_ << hs_imports() << endl;
   f_iface_ << "import " << capitalize(program_name_) << "_Types" << endl;
@@ -814,7 +826,7 @@ void t_hs_generator::generate_service_interface(t_service* tservice) {
  * @param tservice The service to generate a server for.
  */
 void t_hs_generator::generate_service_client(t_service* tservice) {
-  string f_client_name = get_out_dir() + capitalize(service_name_) + "_Client.hs";
+  string f_client_name = modified_path() + capitalize(service_name_) + "_Client.hs";
   f_client_.open(f_client_name.c_str());
   f_client_ << hs_language_pragma() << endl;
   f_client_ << hs_autogen_comment() << endl;
@@ -834,7 +846,7 @@ void t_hs_generator::generate_service_client(t_service* tservice) {
   }
 
   string sname = capitalize(service_name_);
-  indent(f_client_) << "module " << sname << "_Client(" << exports << ") where" << endl;
+  indent(f_client_) << module_prefix() << sname << "_Client(" << exports << ") where" << endl;
 
   if (tservice->get_extends() != NULL) {
     extends = type_name(tservice->get_extends());
